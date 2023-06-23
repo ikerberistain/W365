@@ -1,0 +1,88 @@
+# Pre-reqs to be run if need be below
+# Install the required module if you haven't already
+# Run the following command in PowerShell:
+# Install-Module -Name Microsoft.Graph.DeviceManagement
+# Import the module
+Import-Module -Name Microsoft.Graph.DeviceManagement
+# You might need to change the management profile to beta - Select-MgProfile beta
+#----------------------------------------------------------------------------------------
+
+# Authenticate and connect to Microsoft Graph API
+Connect-MgGraph -Scopes "DeviceManagementServiceConfig.Read.All", "DeviceManagementConfiguration.Read.All", "DeviceManagementServiceConfig.ReadWrite.All"
+
+#----------------------------------------------------------------------------------------
+
+$devices = Get-MgDeviceManagementVirtualEndpointCloudPC -Filter "startswith(servicePlanName,'Cloud PC Frontline')" -Property "id,displayName,powerState"
+
+$poweredOffCount = 0
+$runningCount = 0
+$otherPowerStates = @{}
+$CPCsTotal = $devices.count
+
+foreach ($device in $devices) {
+    $id = $device.id
+    $displayName = $device.displayName
+    $powerState = $device.powerState
+
+    if ($powerState -eq "running") {
+        $runningCount++
+    }
+    elseif ($powerState -eq "poweredoff") {
+        $poweredOffCount++
+    }
+    else {
+        if ($otherPowerStates.ContainsKey($powerState)) {
+            $otherPowerStates[$powerState]++
+        }
+        else {
+            $otherPowerStates[$powerState] = 1
+        }
+    }
+}
+
+Write-Host "Running Count: $runningCount" -ForegroundColor Green
+Write-Host "---------------------------" -ForegroundColor Green
+
+foreach ($device in $devices) {
+    $powerState = $device.powerState
+
+    if ($powerState -eq "running") {
+        $id = $device.id
+        $displayName = $device.displayName
+
+        Write-Host "Device ID: $id"
+        Write-Host "Display Name: $displayName"
+        Write-Host "Power State: $powerState"
+        Write-Host "---------------------------" -ForegroundColor Green
+    }
+}
+
+Write-Host "Powered Off Count: $poweredOffCount" -ForegroundColor Red
+Write-Host "---------------------------" -ForegroundColor Red
+
+foreach ($device in $devices) {
+    $powerState = $device.powerState
+
+    if ($powerState -eq "poweredoff") {
+        $id = $device.id
+        $displayName = $device.displayName
+
+        Write-Host "Device ID: $id"
+        Write-Host "Display Name: $displayName"
+        Write-Host "Power State: $powerState"
+        Write-Host "---------------------------" -ForegroundColor Red
+        
+    }
+}
+
+Write-Host "Other Power States:" -ForegroundColor Yellow
+Write-Host "---------------------------" -ForegroundColor Yellow
+foreach ($state in $otherPowerStates.Keys) {
+    $Othestartecount = $otherPowerStates[$state]
+    Write-Host "$state : $Otherstatecount"
+    
+}
+Write-Host "---------------------------" -ForegroundColor Yellow
+
+
+Write-Host "Summary:`n FLW CPCs Total: $CPCsTotal `n FLW CPCs running: $runningcount  `n FLW CPCs Powered Off: $poweredoffcount `n FLW CPCs in other states: $OtherstateCount" -BackgroundColor White -ForegroundColor Black

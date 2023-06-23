@@ -1,9 +1,9 @@
-# Pre-reqs to be run if need be below
+# Pre-reqs
 # Install the required module if you haven't already
 # Run the following command in PowerShell:
 # Install-Module -Name Microsoft.Graph.DeviceManagement
 # Import the module
-Import-Module -Name Microsoft.Graph.DeviceManagement
+# Import-Module -Name Microsoft.Graph.DeviceManagement
 # You might need to change the management profile to beta - Select-MgProfile beta
 #----------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 # W365 Scripts - W365FrontlineCPCPowerStatus
 
-"W365FrontlineCPCPowerStatus" is a simple PowerShell script has been designed for Cloud PC Frontline adoption during the Preview phase. 
+"W365FrontlineCPCPowerStatus" is a simple PowerShell script that has been designed for Cloud PC Frontline adoption during the Preview phase. 
 
 Having a clear understanding of the Frontline CPCs' status is crucial for effectively managing a complex environment on a large scale, and this script showcases how this can be achieved.
 

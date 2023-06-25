@@ -1,0 +1,43 @@
+# Pre-reqs
+# Install the required module if you haven't already
+# Run the following command in PowerShell:
+# Install-Module -Name Microsoft.Graph.DeviceManagement
+# Import the module
+# Import-Module -Name Microsoft.Graph.DeviceManagement
+# You might need to change the management profile to beta - Select-MgProfile beta
+#----------------------------------------------------------------------------------------
+
+# Authenticate and connect to Microsoft Graph API
+Connect-MgGraph -Scopes "DeviceManagementServiceConfig.Read.All", "DeviceManagementConfiguration.Read.All", "DeviceManagementServiceConfig.ReadWrite.All"
+
+#----------------------------------------------------------------------------------------
+
+# Set the filter criteria
+$filter = "status eq 'Failed'"
+
+# Get the virtual endpoints matching the filter
+$cloudPCs = Get-MgDeviceManagementVirtualEndpointCloudPC -Filter $filter -top "999" #Graph Paging 
+
+
+
+# Output the Device Name of each virtual endpoint
+Write-host "`n See below the list of CloudPCs in failed status: `n " -foregroundcolor Green
+foreach ($cloudPC in $cloudPCs) {
+    Write-Output "Device Name: $($cloudPC.ManagedDeviceName)" 
+}
+# Output the number of results
+Write-host "`n Number of Failed CloudPCs: $($cloudPCs.Count) `n" -foregroundcolor Green
+
+# Prompt the user for reprovisioning confirmation
+Write-host "`n Warning: Do you want to reprovision the listed CloudPCs? `n" -foregroundcolor Red
+$reprovisionConfirmation = Read-Host "(yes/no)"
+
+# Reprovision each virtual endpoint with status "provisioned" if confirmed
+if ($reprovisionConfirmation -eq "yes") {
+    foreach ($cloudPC in $cloudPCs) {
+        Write-Output "Reprovisioning virtual endpoint: $($cloudPC.ManagedDeviceName)"
+        Invoke-MgReprovisionDeviceManagementVirtualEndpointCloudPC -CloudPcId $cloudPC.Id
+    }
+} else {
+    Write-Output "OK - None of the CloudPCs were reprovisioned"
+}
